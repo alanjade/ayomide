@@ -3,9 +3,17 @@ import Link from 'next/link'
 import { Award, BookOpen, Users, Calendar, ArrowRight } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'About | Alalade Ayomide — Registered Town Planner, MNITP',
-  description: 'Registered town planner with 12+ years across urban master plans, EIA consultancy, and land investment strategy. Member, Nigerian Institute of Town Planners.',
-  keywords: ['Alalade Ayomide', 'Nigerian town planner', 'MNITP', 'urban planner Oyo', 'EIA consultant Nigeria', 'TOPREC'],
+  title: 'About Alalade Ayomide | Registered Town Planner MNITP — Ibadan, Nigeria',
+  description: 'Registered Nigerian town planner with 12+ years delivering urban master plans, EIA studies, and land investment strategy. MNITP · TOPREC-licensed · Based in Ibadan, Oyo State.',
+  keywords: ['Alalade Ayomide', 'Nigerian town planner', 'MNITP', 'urban planner Oyo', 'EIA consultant Nigeria', 'TOPREC', 'town planner Ibadan'],
+  openGraph: {
+    title: 'About Alalade Ayomide | Registered Town Planner MNITP',
+    description: 'Registered Nigerian town planner with 12+ years delivering urban master plans, EIA studies, and land investment strategy.',
+    type: 'profile',
+  },
+  alternates: {
+    canonical: '/about',
+  },
 }
 
 const timeline = [

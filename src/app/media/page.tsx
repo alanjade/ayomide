@@ -3,9 +3,17 @@ import { Calendar, MapPin, Mic, Award, BookOpen, Star } from 'lucide-react'
 import { mediaItems } from '@/lib/data'
 
 export const metadata: Metadata = {
-  title: 'Media & Engagements | Alalade Ayomide — Speaking, Events, Press',
-  description: 'Speaking engagements, planning forums, training sessions, and media features for Alalade Ayomide — registered town planner and urban development thought leader.',
-  keywords: ['urban planning speaker Nigeria', 'EIA training Nigeria', 'planning conference Nigeria', 'Alalade Ayomide speaking'],
+  title: 'Media & Engagements | Speaking, Events & Press — Alalade Ayomide, MNITP',
+  description: 'Speaking engagements, planning forums, EIA training sessions, and press features for Alalade Ayomide — registered Nigerian town planner and urban development thought leader.',
+  keywords: ['urban planning speaker Nigeria', 'EIA training Nigeria', 'planning conference Nigeria', 'Alalade Ayomide speaking', 'NITP forum Nigeria'],
+  openGraph: {
+    title: 'Media & Engagements | Speaking, Events & Press — Alalade Ayomide',
+    description: 'Speaking engagements, planning forums, EIA training, and press features from registered town planner Alalade Ayomide.',
+    type: 'website',
+  },
+  alternates: {
+    canonical: '/media',
+  },
 }
 
 const typeConfig: Record<string, { icon: React.ReactNode; color: string; label: string }> = {

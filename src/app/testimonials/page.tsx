@@ -4,9 +4,17 @@ import { Quote, ArrowRight } from 'lucide-react'
 import { testimonials } from '@/lib/data'
 
 export const metadata: Metadata = {
-  title: 'Testimonials | Alalade Ayomide — Client Reviews & Endorsements',
-  description: 'Client testimonials, developer feedback, and institutional endorsements for Alalade Ayomide — registered town planner and urban development consultant.',
-  keywords: ['urban planner reviews Nigeria', 'EIA consultant testimonials', 'planning consultant Nigeria feedback'],
+  title: 'Testimonials | Client Reviews & Endorsements — Alalade Ayomide, MNITP',
+  description: 'What developers, investors, and government agencies say about working with Alalade Ayomide — registered Nigerian town planner, EIA consultant, and urban strategist.',
+  keywords: ['urban planner reviews Nigeria', 'EIA consultant testimonials Nigeria', 'planning consultant feedback', 'Alalade Ayomide reviews', 'MNITP planner testimonials'],
+  openGraph: {
+    title: 'Testimonials | Client Reviews — Alalade Ayomide, MNITP',
+    description: 'Developer, investor, and institutional feedback for registered town planner and EIA consultant Alalade Ayomide.',
+    type: 'website',
+  },
+  alternates: {
+    canonical: '/testimonials',
+  },
 }
 
 const typeOrder = ['Client', 'Developer', 'Institutional'] as const

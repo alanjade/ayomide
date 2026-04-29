@@ -15,13 +15,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const project = projects.find(p => p.slug === slug)
   if (!project) return { title: 'Project Not Found' }
   return {
-    title: `${project.title} | Projects — Alalade Ayomide`,
-    description: project.overview,
-    keywords: [...project.tags, 'urban planning Nigeria', project.state, project.category],
+    title: `${project.title} | ${project.category} Case Study — Alalade Ayomide`,
+    description: `${project.overview.slice(0, 155)}…`,
+    keywords: [...project.tags, 'urban planning Nigeria', project.location, project.category, 'MNITP planner'],
     openGraph: {
-      title: project.title,
-      description: project.overview,
+      title: `${project.title} | ${project.category} — Alalade Ayomide`,
+      description: project.overview.slice(0, 155),
       type: 'article',
+    },
+    alternates: {
+      canonical: `/projects/${slug}`,
     },
   }
 }

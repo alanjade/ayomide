@@ -3,9 +3,17 @@ import Link from 'next/link'
 import { ArrowRight, ExternalLink, Check, TrendingUp, Shield, Users, Layers, AlertTriangle } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Ventures | Alalade Ayomide — reu.ng Fractional Land Investment Nigeria',
-  description: 'Discover reu.ng — fractional land investment platform in Nigeria from ₦5,000. Verified titles, 15–30% projected annual appreciation, secondary market liquidity.',
-  keywords: ['reu.ng', 'fractional land investment Nigeria', 'land investment from 5000 naira', 'Nigeria real estate investment platform'],
+  title: 'Ventures | reu.ng Fractional Land Investment — Alalade Ayomide, MNITP',
+  description: 'reu.ng — Nigeria\'s planning-backed fractional land investment platform. Own verified land from ₦5,000 with 15–30% projected annual appreciation and a built-in secondary market.',
+  keywords: ['reu.ng', 'fractional land investment Nigeria', 'buy land from 5000 naira', 'Nigeria real estate investment platform', 'land investment Ibadan', 'verified land titles Nigeria'],
+  openGraph: {
+    title: 'reu.ng | Fractional Land Investment from ₦5,000 — Alalade Ayomide',
+    description: 'Own verified Nigerian land from ₦5,000. 15–30% projected annual appreciation, secondary market liquidity, FIRS-compliant.',
+    type: 'website',
+  },
+  alternates: {
+    canonical: '/ventures',
+  },
 }
 
 const benefits = [

@@ -1,5 +1,20 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { MapPin, FileText, Building2, TrendingUp, Compass, BarChart3, ArrowRight } from 'lucide-react'
+
+export const metadata: Metadata = {
+  title: 'Services | Planning, EIA & Land Investment — Alalade Ayomide, MNITP',
+  description: 'Professional town planning services: physical layout design, NESREA-compliant EIA studies, feasibility reports, development control advisory, and land investment strategy across Nigeria.',
+  keywords: ['EIA consultant Nigeria', 'physical planning Nigeria', 'development control Oyo', 'land investment strategy Nigeria', 'feasibility study Nigeria', 'NESREA EIA'],
+  openGraph: {
+    title: 'Services | Planning, EIA & Land Investment — Alalade Ayomide',
+    description: 'Physical planning, EIA studies, feasibility reports, development control, and land investment strategy across Nigeria.',
+    type: 'website',
+  },
+  alternates: {
+    canonical: '/services',
+  },
+}
 
 const services = [
   {

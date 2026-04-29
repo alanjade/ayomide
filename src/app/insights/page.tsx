@@ -1,4 +1,19 @@
+import { Metadata} from 'next'
 import { Calendar, Tag, ArrowRight } from 'lucide-react'
+
+export const metadata: Metadata = {
+  title: 'Planning Insights | Urban Development & Land Investment — Alalade Ayomide',
+  description: 'Expert commentary on Nigerian urban development, EIA requirements, zoning law, peri-urban land investment, and PropTech. Written by a registered MNITP town planner.',
+  keywords: ['Nigeria urban planning insights', 'land investment Nigeria', 'EIA requirements Nigeria', 'zoning law Nigeria', 'peri-urban investment'],
+  openGraph: {
+    title: 'Planning Insights | Urban Development & Land Investment',
+    description: 'Expert commentary on Nigerian urban development, EIA requirements, zoning, and land investment by a registered MNITP planner.',
+    type: 'website',
+  },
+  alternates: {
+    canonical: '/insights',
+  },
+}
 
 const posts = [
   {
