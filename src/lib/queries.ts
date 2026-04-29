@@ -98,13 +98,29 @@ export async function getMediaItems(): Promise<MediaItem[]> {
   const { data, error } = await supabase
     .from('media_items')
     .select('*')
-    .order('date', { ascending: false })
+    .order('created_at', { ascending: false })
 
   if (error) {
-    console.error('Error fetching media items:', error)
+    console.error('Error fetching media items:', error.message, error.details, error.hint)
     return []
   }
-  return data ?? []
+
+  if (!data || data.length === 0) {
+    console.warn('media_items query returned no rows — check RLS policies on the table.')
+    return []
+  }
+
+  const validTypes = new Set<MediaItem['type']>(['Speaking', 'Event', 'Training', 'Feature'])
+
+  return data.reduce<MediaItem[]>((acc, row) => {
+    const type = (row.type ?? '').trim() as MediaItem['type']
+    if (!validTypes.has(type)) {
+      console.warn(`media_items: unknown type "${row.type}" on row id="${row.id}" — skipping`)
+      return acc
+    }
+    acc.push({ ...row, type })
+    return acc
+  }, [])
 }
 
 // ─── Contact Submissions ──────────────────────────────────────────────────────

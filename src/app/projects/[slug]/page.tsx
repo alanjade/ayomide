@@ -2,17 +2,18 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { MapPin, Calendar, ArrowLeft, ArrowRight, Users } from 'lucide-react'
-import { projects } from '@/lib/data'
+import { getProjectBySlug, getProjectSlugs, getAdjacentProjects } from '@/lib/queries'
 
 type Props = { params: Promise<{ slug: string }> }
 
 export async function generateStaticParams() {
-  return projects.map(p => ({ slug: p.slug }))
+  const slugs = await getProjectSlugs()
+  return slugs.map((s) => ({ slug: s.slug }))
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const project = projects.find(p => p.slug === slug)
+  const project = await getProjectBySlug(slug)
   if (!project) return { title: 'Project Not Found' }
   return {
     title: `${project.title} | ${project.category} Case Study — Alalade Ayomide`,
@@ -31,12 +32,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProjectPage({ params }: Props) {
   const { slug } = await params
-  const project = projects.find(p => p.slug === slug)
-  if (!project) notFound()
+  const [project, { prev, next }] = await Promise.all([
+    getProjectBySlug(slug),
+    getAdjacentProjects(slug),
+  ])
 
-  const currentIndex = projects.findIndex(p => p.slug === slug)
-  const prev = projects[currentIndex - 1]
-  const next = projects[currentIndex + 1]
+  if (!project) notFound()
 
   return (
     <div style={{ paddingTop: '72px' }}>
@@ -139,7 +140,7 @@ export default async function ProjectPage({ params }: Props) {
               <div style={{ padding: '1.75rem', border: '1px solid var(--border)', backgroundColor: 'var(--bg-card)', marginBottom: '1.5rem' }}>
                 <div className="section-label" style={{ marginBottom: '1rem' }}>Tags</div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-                  {project.tags.map(tag => (
+                  {project.tags.map((tag) => (
                     <span key={tag} style={{ fontSize: '0.65rem', fontWeight: 500, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--accent-green)', backgroundColor: 'var(--bg-subtle)', border: '1px solid var(--border)', padding: '3px 8px' }}>{tag}</span>
                   ))}
                 </div>
@@ -164,13 +165,17 @@ export default async function ProjectPage({ params }: Props) {
         <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
           {prev ? (
             <Link href={`/projects/${prev.slug}`} style={{ padding: '2rem', borderRight: '1px solid var(--border)', textDecoration: 'none', transition: 'background 0.2s' }}>
-              <div style={{ fontSize: '0.65rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}><ArrowLeft size={12} /> Previous</div>
+              <div style={{ fontSize: '0.65rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <ArrowLeft size={12} /> Previous
+              </div>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', color: 'var(--text-primary)' }}>{prev.title}</div>
             </Link>
           ) : <div />}
           {next && (
             <Link href={`/projects/${next.slug}`} style={{ padding: '2rem', textAlign: 'right', textDecoration: 'none', transition: 'background 0.2s' }}>
-              <div style={{ fontSize: '0.65rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.35rem' }}>Next <ArrowRight size={12} /></div>
+              <div style={{ fontSize: '0.65rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.35rem' }}>
+                Next <ArrowRight size={12} />
+              </div>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', color: 'var(--text-primary)' }}>{next.title}</div>
             </Link>
           )}

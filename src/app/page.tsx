@@ -201,7 +201,7 @@ export default async function HomePage() {
                   </div>
                   <div>
                     <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>{t.name}</div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{t.title} · {t.org}</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{t.title} · {t.organization}</div>
                   </div>
                 </div>
               </div>

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Quote, ArrowRight } from 'lucide-react'
-import { testimonials } from '@/lib/data'
+import { getTestimonials } from '@/lib/queries'
 
 export const metadata: Metadata = {
   title: 'Testimonials | Client Reviews & Endorsements — Alalade Ayomide, MNITP',
@@ -19,7 +19,9 @@ export const metadata: Metadata = {
 
 const typeOrder = ['Client', 'Developer', 'Institutional'] as const
 
-export default function TestimonialsPage() {
+export default async function TestimonialsPage() {
+  const testimonials = await getTestimonials()
+
   return (
     <div style={{ paddingTop: '72px' }}>
       {/* Header */}
@@ -35,28 +37,11 @@ export default function TestimonialsPage() {
         </div>
       </section>
 
-      {/* Stats bar */}
-      {/* <div style={{ backgroundColor: 'var(--bg-subtle)', borderBottom: '1px solid var(--border)', padding: '1.5rem 2rem' }}>
-        <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', gap: '3rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-          {[
-            { value: '50+', label: 'Projects Delivered' },
-            { value: '100%', label: 'Client Retention Rate' },
-            { value: '12+', label: 'Years of Practice' },
-            { value: '4.9/5', label: 'Training Satisfaction' },
-          ].map((s, i) => (
-            <div key={i} style={{ textAlign: 'center' }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.8rem', fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1 }}>{s.value}</div>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '3px', letterSpacing: '0.04em' }}>{s.label}</div>
-            </div>
-          ))}
-        </div>
-      </div> */}
-
       {/* Testimonials by type */}
       <section style={{ padding: '5rem 2rem', backgroundColor: 'var(--bg-primary)' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
           {typeOrder.map((type) => {
-            const group = testimonials.filter(t => t.type === type)
+            const group = testimonials.filter((t) => t.type === type)
             if (!group.length) return null
             return (
               <div key={type} style={{ marginBottom: '5rem' }}>
@@ -67,7 +52,7 @@ export default function TestimonialsPage() {
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
                   {group.map((t, i) => (
-                    <div key={i} className="card" style={{ padding: '2.25rem', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-card)' }}>
+                    <div key={t.id ?? i} className="card" style={{ padding: '2.25rem', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-card)' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
                         <Quote size={28} color="var(--accent-green)" style={{ opacity: 0.5 }} />
                         <div style={{
@@ -86,13 +71,17 @@ export default function TestimonialsPage() {
                       </p>
 
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', borderTop: '1px solid var(--border-light)', paddingTop: '1.25rem' }}>
-                        <div style={{ width: '44px', height: '44px', backgroundColor: t.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                          <span style={{ fontFamily: 'var(--font-display)', fontSize: '1rem', color: '#FAF8F5', fontWeight: 600 }}>{t.initials}</span>
+                        <div style={{ width: '44px', height: '44px', backgroundColor: t.color ?? 'var(--accent-green)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <span style={{ fontFamily: 'var(--font-display)', fontSize: '1rem', color: '#FAF8F5', fontWeight: 600 }}>
+                            {t.initials ?? t.name.slice(0, 2).toUpperCase()}
+                          </span>
                         </div>
                         <div>
                           <div style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1.2 }}>{t.name}</div>
                           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>{t.title}</div>
-                          <div style={{ fontSize: '0.72rem', color: 'var(--accent-earth)', fontStyle: 'italic', marginTop: '1px' }}>{t.org}</div>
+                          {t.organization && (
+                            <div style={{ fontSize: '0.72rem', color: 'var(--accent-earth)', fontStyle: 'italic', marginTop: '1px' }}>{t.organization}</div>
+                          )}
                         </div>
                       </div>
                     </div>

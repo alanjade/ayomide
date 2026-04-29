@@ -25,14 +25,22 @@ export const metadata: Metadata = {
   },
 }
 
-const typeConfig: Record<
-  MediaItem['type'],
-  { icon: React.ReactNode; color: string; label: string }
-> = {
-  Speaking: { icon: <Mic size={16} />, color: '#2D5016', label: 'Speaking' },
-  Event: { icon: <Star size={16} />, color: '#8B5E3C', label: 'Event' },
-  Training: { icon: <BookOpen size={16} />, color: '#4A7C28', label: 'Training' },
-  Feature: { icon: <Award size={16} />, color: '#3C6B8B', label: 'Press Feature' },
+// ─── Type config ──────────────────────────────────────────────────────────────
+// Icons are rendered inline inside JSX, so the object is defined as a plain
+// record mapping to a render function rather than storing JSX nodes at module
+// level (which causes React element hydration issues in some Next.js configs).
+
+type TypeConfig = {
+  icon: () => React.ReactNode
+  color: string
+  label: string
+}
+
+const typeConfig: Record<MediaItem['type'], TypeConfig> = {
+  Speaking: { icon: () => <Mic size={16} />, color: '#2D5016', label: 'Speaking' },
+  Event:    { icon: () => <Star size={16} />, color: '#8B5E3C', label: 'Event' },
+  Training: { icon: () => <BookOpen size={16} />, color: '#4A7C28', label: 'Training' },
+  Feature:  { icon: () => <Award size={16} />, color: '#3C6B8B', label: 'Press Feature' },
 }
 
 const galleryPlaceholders = [
@@ -49,6 +57,7 @@ export default async function MediaPage() {
 
   return (
     <div style={{ paddingTop: '72px' }}>
+      {/* ── Hero ────────────────────────────────────────────────────────── */}
       <section
         style={{
           backgroundColor: 'var(--bg-secondary)',
@@ -87,7 +96,7 @@ export default async function MediaPage() {
         </div>
       </section>
 
-      {/* Type counts */}
+      {/* ── Type counts ─────────────────────────────────────────────────── */}
       <div
         style={{
           backgroundColor: 'var(--bg-subtle)',
@@ -104,12 +113,12 @@ export default async function MediaPage() {
             flexWrap: 'wrap',
           }}
         >
-          {(Object.entries(typeConfig) as [MediaItem['type'], (typeof typeConfig)[MediaItem['type']]][]).map(
+          {(Object.entries(typeConfig) as [MediaItem['type'], TypeConfig][]).map(
             ([type, config]) => {
               const count = mediaItems.filter((m) => m.type === type).length
               return (
                 <div key={type} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <div style={{ color: config.color }}>{config.icon}</div>
+                  <div style={{ color: config.color }}>{config.icon()}</div>
                   <span
                     style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)' }}
                   >
@@ -126,138 +135,152 @@ export default async function MediaPage() {
         </div>
       </div>
 
-      {/* Engagements */}
+      {/* ── Engagements list ────────────────────────────────────────────── */}
       <section style={{ padding: '5rem 2rem', backgroundColor: 'var(--bg-primary)' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
           <div className="section-label" style={{ marginBottom: '2rem' }}>
             Engagements
           </div>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '1.5px',
-              backgroundColor: 'var(--border)',
-            }}
-          >
-            {mediaItems.map((item) => {
-              const config = typeConfig[item.type]
-              return (
-                <div
-                  key={item.id}
-                  style={{
-                    backgroundColor: 'var(--bg-card)',
-                    display: 'grid',
-                    gridTemplateColumns: 'auto 1fr',
-                    overflow: 'hidden',
-                  }}
-                >
-                  {/* Colour stripe */}
-                  <div style={{ width: '6px', backgroundColor: item.color, flexShrink: 0 }} />
+
+          {mediaItems.length === 0 ? (
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
+              No engagements found.
+            </p>
+          ) : (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1.5px',
+                backgroundColor: 'var(--border)',
+              }}
+            >
+              {mediaItems.map((item) => {
+                const config = typeConfig[item.type]
+                // Guard against unknown types coming from the DB
+                if (!config) return null
+
+                return (
                   <div
+                    key={item.id}
                     style={{
-                      padding: '2rem 2.5rem',
+                      backgroundColor: 'var(--bg-card)',
                       display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-                      gap: '2rem',
-                      alignItems: 'start',
+                      gridTemplateColumns: 'auto 1fr',
+                      overflow: 'hidden',
                     }}
                   >
-                    <div>
-                      <div
-                        style={{
-                          display: 'flex',
-                          gap: '0.5rem',
-                          alignItems: 'center',
-                          marginBottom: '0.875rem',
-                        }}
-                      >
+                    {/* Colour stripe */}
+                    <div style={{ width: '6px', backgroundColor: item.color, flexShrink: 0 }} />
+
+                    <div
+                      style={{
+                        padding: '2rem 2.5rem',
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                        gap: '2rem',
+                        alignItems: 'start',
+                      }}
+                    >
+                      {/* Left column */}
+                      <div>
                         <div
                           style={{
                             display: 'flex',
+                            gap: '0.5rem',
                             alignItems: 'center',
-                            gap: '0.35rem',
-                            backgroundColor: 'var(--bg-subtle)',
-                            border: '1px solid var(--border)',
-                            padding: '3px 8px',
-                            color: config.color,
-                            fontSize: '0.65rem',
-                            fontWeight: 600,
-                            letterSpacing: '0.08em',
-                            textTransform: 'uppercase',
+                            marginBottom: '0.875rem',
                           }}
                         >
-                          {config.icon} {config.label}
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.35rem',
+                              backgroundColor: 'var(--bg-subtle)',
+                              border: '1px solid var(--border)',
+                              padding: '3px 8px',
+                              color: config.color,
+                              fontSize: '0.65rem',
+                              fontWeight: 600,
+                              letterSpacing: '0.08em',
+                              textTransform: 'uppercase',
+                            }}
+                          >
+                            {config.icon()} {config.label}
+                          </div>
+                        </div>
+                        <h3
+                          style={{
+                            fontFamily: 'var(--font-display)',
+                            fontSize: '1.3rem',
+                            fontWeight: 500,
+                            color: 'var(--text-primary)',
+                            marginBottom: '0.5rem',
+                            lineHeight: 1.2,
+                          }}
+                        >
+                          {item.title}
+                        </h3>
+                        <div
+                          style={{
+                            fontSize: '0.85rem',
+                            color: 'var(--accent-green)',
+                            fontStyle: 'italic',
+                            marginBottom: '0.75rem',
+                          }}
+                        >
+                          {item.subtitle}
                         </div>
                       </div>
-                      <h3
-                        style={{
-                          fontFamily: 'var(--font-display)',
-                          fontSize: '1.3rem',
-                          fontWeight: 500,
-                          color: 'var(--text-primary)',
-                          marginBottom: '0.5rem',
-                          lineHeight: 1.2,
-                        }}
-                      >
-                        {item.title}
-                      </h3>
-                      <div
-                        style={{
-                          fontSize: '0.85rem',
-                          color: 'var(--accent-green)',
-                          fontStyle: 'italic',
-                          marginBottom: '0.75rem',
-                        }}
-                      >
-                        {item.subtitle}
-                      </div>
-                    </div>
-                    <div>
-                      <p
-                        style={{
-                          fontSize: '0.875rem',
-                          color: 'var(--text-secondary)',
-                          lineHeight: 1.7,
-                          marginBottom: '1rem',
-                        }}
-                      >
-                        {item.description}
-                      </p>
-                      <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
-                        <div
+
+                      {/* Right column */}
+                      <div>
+                        <p
                           style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.35rem',
-                            fontSize: '0.78rem',
-                            color: 'var(--text-muted)',
+                            fontSize: '0.875rem',
+                            color: 'var(--text-secondary)',
+                            lineHeight: 1.7,
+                            marginBottom: '1rem',
                           }}
                         >
-                          <Calendar size={13} /> {item.date}
-                        </div>
-                        <div
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.35rem',
-                            fontSize: '0.78rem',
-                            color: 'var(--text-muted)',
-                          }}
-                        >
-                          <MapPin size={13} /> {item.location}
+                          {item.description}
+                        </p>
+                        <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.35rem',
+                              fontSize: '0.78rem',
+                              color: 'var(--text-muted)',
+                            }}
+                          >
+                            <Calendar size={13} /> {item.date}
+                          </div>
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.35rem',
+                              fontSize: '0.78rem',
+                              color: 'var(--text-muted)',
+                            }}
+                          >
+                            <MapPin size={13} /> {item.location}
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              )
-            })}
-          </div>
+                )
+              })}
+            </div>
+          )}
         </div>
       </section>
 
-      {/* Photo Gallery */}
+      {/* ── Photo Gallery ───────────────────────────────────────────────── */}
       <section
         style={{
           padding: '5rem 2rem',
@@ -280,6 +303,18 @@ export default async function MediaPage() {
           >
             In the Field &amp; On Stage
           </h2>
+
+          {/*
+            Gallery grid: first item spans 2 columns on wide screens only.
+            We use a CSS class + media query approach via inline style tag to
+            avoid the hard-coded `gridColumn: 'span 2'` that breaks on mobile.
+          */}
+          <style>{`
+            @media (min-width: 640px) {
+              .gallery-item-wide { grid-column: span 2; }
+            }
+          `}</style>
+
           <div
             style={{
               display: 'grid',
@@ -290,13 +325,13 @@ export default async function MediaPage() {
             {galleryPlaceholders.map((caption, i) => (
               <div
                 key={i}
+                className={i === 0 || i === 3 ? 'gallery-item-wide' : undefined}
                 style={{
                   aspectRatio: i === 0 || i === 3 ? '16/9' : '4/3',
                   backgroundColor: 'var(--bg-subtle)',
                   border: '1px solid var(--border)',
                   position: 'relative',
                   overflow: 'hidden',
-                  gridColumn: i === 0 ? 'span 2' : 'span 1',
                 }}
               >
                 <div className="map-grid" style={{ position: 'absolute', inset: 0, opacity: 0.5 }} />
@@ -310,7 +345,13 @@ export default async function MediaPage() {
                     background: 'linear-gradient(transparent, rgba(0,0,0,0.5))',
                   }}
                 >
-                  <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.7)', letterSpacing: '0.06em' }}>
+                  <div
+                    style={{
+                      fontSize: '0.72rem',
+                      color: 'rgba(255,255,255,0.7)',
+                      letterSpacing: '0.06em',
+                    }}
+                  >
                     {caption}
                   </div>
                 </div>
@@ -341,7 +382,7 @@ export default async function MediaPage() {
         </div>
       </section>
 
-      {/* Speaking CTA */}
+      {/* ── Speaking CTA ────────────────────────────────────────────────── */}
       <section style={{ backgroundColor: 'var(--accent-green)', padding: '4rem 2rem' }}>
         <div
           style={{
@@ -377,7 +418,13 @@ export default async function MediaPage() {
             >
               Invite Ayomide to Speak
             </h2>
-            <p style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.75)', marginTop: '0.5rem' }}>
+            <p
+              style={{
+                fontSize: '0.875rem',
+                color: 'rgba(255,255,255,0.75)',
+                marginTop: '0.5rem',
+              }}
+            >
               Planning forums, real estate conferences, investment summits, and training programmes.
             </p>
           </div>
