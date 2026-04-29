@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowRight, MapPin, FileText, Building2, TrendingUp, ChevronRight, Quote, ExternalLink } from 'lucide-react'
-import { projects, testimonials } from '@/lib/data'
+import { getProjects, getTestimonials } from '@/lib/queries'
 
 export const metadata: Metadata = {
   title: 'Alalade Ayomide | Town Planner & Urban Strategist — Nigeria',
@@ -28,10 +28,15 @@ const affiliations = [
   { short: 'ESRI', full: 'Certified GIS Professional', color: '#3C6B8B' },
 ]
 
-const featuredProjects = projects.slice(0, 3)
-const featuredTestimonials = testimonials.slice(0, 3)
+export default async function HomePage() {
+  const [projects, testimonials] = await Promise.all([
+    getProjects(),
+    getTestimonials(),
+  ])
 
-export default function HomePage() {
+  const featuredProjects = projects.slice(0, 3)
+  const featuredTestimonials = testimonials.slice(0, 3)
+
   return (
     <div>
       {/* ── HERO ─────────────────────────────────── */}
@@ -65,7 +70,6 @@ export default function HomePage() {
             {/* ── ABOUT SNAPSHOT ── */}
             <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', padding: '2.5rem', maxWidth: '420px' }}>
               <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
-                {/* Profile image placeholder */}
                 <div style={{ width: '80px', height: '80px', backgroundColor: 'var(--accent-green)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', fontWeight: 600, color: '#FAF8F5' }}>AA</span>
                 </div>
@@ -78,8 +82,6 @@ export default function HomePage() {
                 Registered town planner with 12+ years across urban master plans, EIA consultancy,
                 and land investment strategy. Founder of reu.ng, Nigeria&apos;s fractional land investment platform.
               </p>
-
-              {/* Trust signals / affiliations */}
               <div className="section-label" style={{ marginBottom: '0.875rem' }}>Affiliations & Credentials</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.75rem' }}>
                 {affiliations.map((a) => (
@@ -89,7 +91,6 @@ export default function HomePage() {
                   </div>
                 ))}
               </div>
-
               <Link href="/about" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.78rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--accent-green)', textDecoration: 'none' }}>
                 Full Profile <ChevronRight size={14} />
               </Link>

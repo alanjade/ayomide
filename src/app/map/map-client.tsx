@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { MapPin, X, ArrowRight } from 'lucide-react'
-import { projects, type Project } from '@/lib/data'
+import { getProjects } from '@/lib/queries'
+import type { Project } from '@/lib/supabase'
 
 type LeafletMap = import('leaflet').Map
 type LeafletLib = typeof import('leaflet')
@@ -22,10 +23,21 @@ export function MapClient() {
   const [mapLoaded, setMapLoaded] = useState(false)
   const mapInstanceRef = useRef<LeafletMap | null>(null)
   const LRef = useRef<LeafletLib | null>(null)
+  const [projects, setProjects] = useState<Project[]>([])
 
   const categories = ['All', 'Urban Development', 'EIA', 'Residential Layout', 'Tourism Planning']
   const filtered = activeFilter === 'All' ? projects : projects.filter(p => p.category === activeFilter)
 
+  // Fetch projects from Supabase
+  useEffect(() => {
+    const fetchProjects = async () => {
+      const projectsData = await getProjects()
+      setProjects(projectsData)
+    }
+    fetchProjects()
+  }, [])
+
+  // Initialize map once on mount
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return
 
@@ -58,21 +70,6 @@ export function MapClient() {
       }).addTo(map)
 
       setMapLoaded(true)
-
-      projects.forEach((project) => {
-        const color = categoryColors[project.category] || '#2D5016'
-        const icon = L.divIcon({
-          className: '',
-          html: `<div style="width:34px;height:34px;background:${color};border:3px solid #fff;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 2px 8px rgba(0,0,0,0.3);cursor:pointer;"></div>`,
-          iconSize: [34, 34],
-          iconAnchor: [17, 34],
-          popupAnchor: [0, -34],
-        })
-
-        L.marker([project.lat, project.lng], { icon })
-          .addTo(map)
-          .on('click', () => setSelected(project))
-      })
     })
 
     return () => {
@@ -80,6 +77,28 @@ export function MapClient() {
       mapInstanceRef.current = null
     }
   }, [])
+
+  // Add markers once both map and projects are ready
+  useEffect(() => {
+    const L = LRef.current
+    const map = mapInstanceRef.current
+    if (!L || !map || projects.length === 0) return
+
+    projects.forEach((project) => {
+      const color = categoryColors[project.category] || '#2D5016'
+      const icon = L.divIcon({
+        className: '',
+        html: `<div style="width:34px;height:34px;background:${color};border:3px solid #fff;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 2px 8px rgba(0,0,0,0.3);cursor:pointer;"></div>`,
+        iconSize: [34, 34],
+        iconAnchor: [17, 34],
+        popupAnchor: [0, -34],
+      })
+
+      L.marker([project.lat, project.lng], { icon })
+        .addTo(map)
+        .on('click', () => setSelected(project))
+    })
+  }, [projects])
 
   return (
     <div style={{ paddingTop: '72px' }}>
@@ -161,8 +180,8 @@ export function MapClient() {
               <div style={{ marginBottom: '1.5rem' }}>
                 <div className="section-label" style={{ marginBottom: '0.75rem' }}>Key Metrics</div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-                  {selected.metrics.map((m, i) => (
-                    <div key={i} style={{ padding: '0.875rem', backgroundColor: 'var(--bg-subtle)', border: '1px solid var(--border)', textAlign: 'center' }}>
+                  {selected.metrics.map((m) => (
+                    <div key={m.label} style={{ padding: '0.875rem', backgroundColor: 'var(--bg-subtle)', border: '1px solid var(--border)', textAlign: 'center' }}>
                       <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', fontWeight: 600, color: 'var(--text-primary)' }}>{m.value}</div>
                       <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: '2px' }}>{m.label}</div>
                     </div>

@@ -1,7 +1,8 @@
 import { MetadataRoute } from 'next'
-import { projects } from '@/lib/data'
+import { getProjects } from '@/lib/queries'
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const projects = await getProjects()
   const projectUrls = projects.map(p => ({
     url: `${process.env.NEXT_PUBLIC_APP_URL}/projects/${p.slug}`,
     lastModified: new Date(),
